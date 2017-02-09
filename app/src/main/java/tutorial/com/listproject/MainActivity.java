@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     List<String> list = new ArrayList<>();
 
+    //Классы для хранения примитивных данных в память устройства
+    // (int, double, string, long, ...)
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
 
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Инициализация
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = preferences.edit();
 
@@ -87,18 +90,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    //Метод для хранения списка в память телефона,
+    // так как список не является примитивным типом данных,
+    // мы переводим его в примитивный тип данных в String
+    // через JsonArray
+    //Cхема перевода List -> JsonArray -> String
     public String jsonArray(List<String> list) {
         JSONArray array = new JSONArray();
 
+        //Каждый элемент листа записываем в JsonArray
         for (String str : list) {
             array.put(str);
         }
         return array.toString();
     }
 
+
+    //Метод для перевода из String в List
+    //Cхема перевода String -> JsonArray -> List
     public List<String> getList(String data) {
         try {
             JSONArray array = new JSONArray(data);
+            //Каждый элемент JsonArray записывам в List
             for (int i = 0; i < array.length(); i++) {
                 list.add(array.get(i).toString());
             }
