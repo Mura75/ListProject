@@ -10,13 +10,47 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="tutorial.com.listproject.WordActivity">
 
+    <Switch
+        android:text="Switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/switchNotif"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
     <TextView
         android:text="TextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="219dp"
         android:textSize="40sp"
-        android:id="@+id/tvShowWord" />
+        android:id="@+id/tvShowWord"
+        android:layout_below="@+id/switchNotif"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/switchNotif"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="157dp"
+        android:id="@+id/tvCounter" />
+
+    <Button
+        android:text="Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvCounter"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="26dp"
+        android:id="@+id/buttonCount" />
+
+    <Button
+        android:text="Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/switchNotif"
+        android:layout_alignStart="@+id/switchNotif"
+        android:id="@+id/buttonClear" />
 </RelativeLayout>
