@@ -50,8 +50,9 @@ public class MainActivity extends AppCompatActivity {
         buttonEnter = (Button) findViewById(R.id.buttonEnter);
         lvWords = (ListView) findViewById(R.id.lvWords);
 
-//        list.add("qwerty");
-//        list.add("asdf");
+        for (int i = 0; i < 10000; i++) {
+            list.add("Number: " + i);
+        }
 
         String data = preferences.getString("list", "");
 
