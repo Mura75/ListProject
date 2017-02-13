@@ -1,9 +1,14 @@
 package tutorial.com.contactbook.controllers;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.List;
@@ -20,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
 
     private GetAllContactAsync getAllContactAsync;
 
+    List<Contact> contactList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,8 +34,46 @@ public class MainActivity extends AppCompatActivity {
 
         lvContact = (ListView) findViewById(R.id.lvContact);
 
+
+        //Obrabativaem klic elementa spiske
+        lvContact.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Otpravliaem sushnost' kontakta v drugoe okno
+                Contact contact = contactList.get(position);
+                Intent intent = new Intent(MainActivity.this, ContactActivity.class);
+                intent.putExtra("contact_entity", contact);
+                startActivity(intent);
+            }
+        });
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         getAllContactAsync = new GetAllContactAsync();
         getAllContactAsync.execute();
+    }
+
+
+    //Privazivaem menu k Activity
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.contact_list_menu, menu);
+        return true;
+    }
+
+
+    //Obrabativaem klik knopki v menu
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.actionCreate) {
+            Intent intent = new Intent(MainActivity.this, ContactActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -42,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
     //Класс для работы в фоновом режиме
     private class GetAllContactAsync extends AsyncTask<Void, Void, Void> {
 
-        List<Contact> contactList;
 
         @Override
         protected void onPreExecute() {
@@ -53,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             //В фоновом режиме достаем список всех контактов
             DatabaseConnector connector = new DatabaseConnector(MainActivity.this);
+            Log.d("Contact_list_bg", connector.getAllContacts().toString());
             contactList = connector.getAllContacts();
             return null;
         }

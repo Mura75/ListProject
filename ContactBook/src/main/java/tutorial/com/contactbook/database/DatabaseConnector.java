@@ -24,7 +24,7 @@ public class DatabaseConnector {
     public static final String TABLE_NAME = "CONTACT";
 
     //Версия базы данных
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     //Столбец для ID
     public static final String ID = "ID";
@@ -45,7 +45,7 @@ public class DatabaseConnector {
             " (" + ID + " integer primary key autoincrement, " +
                     NAME + " TEXT, " +
                     PHONE + " TEXT, " +
-                    EMAIL + " TEXT"+ ");";
+                    EMAIL + " TEXT" + ");";
 
 
     //Класс для работы с базой данных
@@ -125,7 +125,7 @@ public class DatabaseConnector {
         //Upgrade базы данных
         @Override
         public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-            sqLiteDatabase.execSQL("DROP TABLE IF EXIST " + TABLE_NAME);
+            sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
             onCreate(sqLiteDatabase);
         }
     }
