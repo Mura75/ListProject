@@ -1,7 +1,9 @@
 package tutorial.com.contactbook.controllers;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -24,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private ContactAdapter contactAdapter;
 
     private GetAllContactAsync getAllContactAsync;
+    private RemoveContact removeContact;
 
     List<Contact> contactList;
 
@@ -46,6 +50,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        lvContact.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Contact contactToRemove = contactList.get(position);
+                showRemoveContactDialog(contactToRemove);
+                return true;
+            }
+        });
     }
 
 
@@ -54,6 +67,28 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         getAllContactAsync = new GetAllContactAsync();
         getAllContactAsync.execute();
+    }
+
+
+    private void showRemoveContactDialog(final Contact contact) {
+        AlertDialog alertDialog =
+                new AlertDialog.Builder(MainActivity.this)
+                        .setMessage("Do you want remove " + contact.getName() + " ?")
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                removeContact = new RemoveContact(contact);
+                                removeContact.execute();
+                            }
+                        })
+                        .create();
+        alertDialog.show();
     }
 
 
@@ -108,6 +143,34 @@ public class MainActivity extends AppCompatActivity {
             //Показываем все данные в списке, для юзера
             contactAdapter = new ContactAdapter(MainActivity.this, contactList);
             lvContact.setAdapter(contactAdapter);
+        }
+    }
+
+    private class RemoveContact extends AsyncTask<Void, Void, Void> {
+
+        private Contact contact;
+
+        public RemoveContact(Contact contact) {
+            this.contact = contact;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            DatabaseConnector connector =
+                    new DatabaseConnector(MainActivity.this);
+            connector.removeContact(contact);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            contactList.remove(contact);
+            contactAdapter.notifyDataSetChanged();
+            Toast.makeText(MainActivity.this,
+                        "Contact was removed",
+                        Toast.LENGTH_SHORT)
+                    .show();
         }
     }
 }

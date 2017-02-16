@@ -85,6 +85,30 @@ public class DatabaseConnector {
         close();
     }
 
+    //Obnovlenie kontakta v baza dannih
+    public void updateContact(Contact contact) {
+        ContentValues values = new ContentValues();
+        values.put(NAME, contact.getName());
+        values.put(PHONE, contact.getPhoneNumber());
+        values.put(EMAIL, contact.getEmail());
+
+        open();
+        database.update(TABLE_NAME,
+                values,
+                ID + "=" + contact.getId(),
+                null);
+        close();
+    }
+
+    //Udalenie kontakta is tablici
+    public void removeContact(Contact contact) {
+        open();
+        database.delete(TABLE_NAME,
+                ID + "=?",
+                new String[]{contact.getId() + ""});
+        close();
+    }
+
 
     //Достаем все данные с БД и записываем в спискок
     public List<Contact> getAllContacts() {

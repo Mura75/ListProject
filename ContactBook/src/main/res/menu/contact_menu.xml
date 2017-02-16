@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:title="Call"
+        android:id="@+id/actionCall"
+        android:icon="@android:drawable/ic_menu_call"
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom"/>
+
+
+    <item android:title="SMS"
+        android:id="@+id/actionSMS"
+        android:icon="@android:drawable/stat_notify_chat"
+        android:orderInCategory="2"
+        app:showAsAction="ifRoom"/>
+
+
+    <item android:title="Email"
+        android:id="@+id/actionEmail"
+        android:icon="@android:drawable/sym_action_email"
+        android:orderInCategory="2"
+        app:showAsAction="ifRoom"/>
+</menu>
