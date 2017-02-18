@@ -3,6 +3,7 @@ package tutorial.com.contactbook.controllers;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import tutorial.com.contactbook.R;
@@ -18,6 +20,8 @@ import tutorial.com.contactbook.database.DatabaseConnector;
 import tutorial.com.contactbook.model.Contact;
 
 public class ContactActivity extends AppCompatActivity {
+
+    private ImageView ivAvatar;
 
     private EditText etName, etSurname, etPhone, etEmail;
 
@@ -32,6 +36,7 @@ public class ContactActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
 
+        ivAvatar = (ImageView) findViewById(R.id.ivAvatar);
         etName = (EditText) findViewById(R.id.etName);
         etSurname = (EditText) findViewById(R.id.etSurname);
         etPhone = (EditText) findViewById(R.id.etPhone);
@@ -52,6 +57,17 @@ public class ContactActivity extends AppCompatActivity {
         });
 
 
+        ivAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isVersion23() == true) {
+
+                }
+                else {
+
+                }
+            }
+        });
 
 
         //Prinimaem sushnost kontakta esli ono est po kluchevomu slovu
@@ -67,6 +83,10 @@ public class ContactActivity extends AppCompatActivity {
         }
     }
 
+
+    private boolean isVersion23() {
+        return Build.VERSION.SDK_INT >= 23;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

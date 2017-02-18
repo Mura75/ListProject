@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
             contactList.remove(contact);
             contactAdapter.notifyDataSetChanged();
             Toast.makeText(MainActivity.this,
-                        "Contact was removed",
+                        "Contact removed",
                         Toast.LENGTH_SHORT)
                     .show();
         }
