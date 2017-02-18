@@ -1,15 +1,18 @@
 package tutorial.com.contactbook.controllers;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -60,6 +63,9 @@ public class ContactActivity extends AppCompatActivity {
         ivAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                avatarDialog();
+
                 if (isVersion23() == true) {
 
                 }
@@ -83,6 +89,38 @@ public class ContactActivity extends AppCompatActivity {
         }
     }
 
+
+    public void avatarDialog() {
+
+        ArrayAdapter<String> arrayAdapter =
+                new ArrayAdapter<String>(this,
+                        android.R.layout.simple_list_item_1,
+                        android.R.id.text1,
+                        new String[]{"Camera", "Gallery"});
+
+        AlertDialog avatarDialog =
+                    new AlertDialog.Builder(this)
+                    .setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (which == 0) {
+                                Toast.makeText(ContactActivity.this,
+                                        "Camera",
+                                        Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                            else if (which == 1) {
+                                Toast.makeText(ContactActivity.this,
+                                        "Gallery",
+                                        Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                        }
+                    })
+                    .create();
+
+        avatarDialog.show();
+    }
 
     private boolean isVersion23() {
         return Build.VERSION.SDK_INT >= 23;
