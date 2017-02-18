@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -24,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,8 +37,10 @@ import tutorial.com.contactbook.model.Contact;
 public class ContactActivity extends AppCompatActivity {
 
     private static final int CAMERA_PERMISSION_REQUEST = 300;
+    private static final int GALLERY_PERMISSION_REQUEST = 301;
 
     private static final int CAMERA_REQUEST = 400;
+    private static final int GALLERY_REQUEST = 401;
 
     private ImageView ivAvatar;
 
@@ -115,19 +119,18 @@ public class ContactActivity extends AppCompatActivity {
                                     getCameraPermission();
                                 }
                                 else {
-
+                                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                    startActivityForResult(intent, CAMERA_REQUEST);
                                 }
-
-                                Toast.makeText(ContactActivity.this,
-                                        "Camera",
-                                        Toast.LENGTH_SHORT)
-                                        .show();
                             }
                             else if (which == 1) {
-                                Toast.makeText(ContactActivity.this,
-                                        "Gallery",
-                                        Toast.LENGTH_SHORT)
-                                        .show();
+                                if (isVersion23() == true) {
+                                    getGalleryPermission();
+                                }
+                                else {
+                                    Intent intent = new Intent(Intent.ACTION_PICK);
+                                    startActivityForResult(intent, GALLERY_REQUEST);
+                                }
                             }
                         }
                     })
@@ -161,6 +164,25 @@ public class ContactActivity extends AppCompatActivity {
         }
     }
 
+    private void getGalleryPermission() {
+        boolean hasGalleryPermission =
+                (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE))
+                        == PackageManager.PERMISSION_GRANTED;
+
+
+        if (hasGalleryPermission == true) {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            startActivityForResult(intent, GALLERY_REQUEST);
+        }
+        else {
+            requestPermissions(
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    GALLERY_PERMISSION_REQUEST);
+        }
+    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -188,6 +210,16 @@ public class ContactActivity extends AppCompatActivity {
                             Manifest.permission.READ_EXTERNAL_STORAGE},
                     CAMERA_PERMISSION_REQUEST);
         }
+
+        if (requestCode == GALLERY_PERMISSION_REQUEST) {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            startActivityForResult(intent, GALLERY_REQUEST);
+        }
+        else {
+            requestPermissions(
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    GALLERY_PERMISSION_REQUEST);
+        }
     }
 
     @Override
@@ -195,10 +227,29 @@ public class ContactActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == CAMERA_REQUEST) {
-                Log.d("Camera_result_data", data.toString());
+                Log.d("Camera_result_data", data.getExtras().get("data").toString());
+                Bitmap bitmap = (Bitmap)data.getExtras().get("data");
+                ivAvatar.setImageBitmap(bitmap);
             }
-        }
+            else if (requestCode == GALLERY_REQUEST) {
+                if (data != null) {
+                    Log.d("Gallery_result_data", data.getData().toString());
+
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(),
+                                data.getData());
+                        ivAvatar.setImageBitmap(bitmap);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                }
+                else {
+                    Log.d("Gallery_result_data", "Null");
+                }
+            }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
