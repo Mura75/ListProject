@@ -1,10 +1,16 @@
 package tutorial.com.contactbook.controllers;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,11 +24,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import tutorial.com.contactbook.R;
 import tutorial.com.contactbook.database.DatabaseConnector;
 import tutorial.com.contactbook.model.Contact;
 
 public class ContactActivity extends AppCompatActivity {
+
+    private static final int CAMERA_PERMISSION_REQUEST = 300;
+
+    private static final int CAMERA_REQUEST = 400;
 
     private ImageView ivAvatar;
 
@@ -63,15 +77,7 @@ public class ContactActivity extends AppCompatActivity {
         ivAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 avatarDialog();
-
-                if (isVersion23() == true) {
-
-                }
-                else {
-
-                }
             }
         });
 
@@ -104,6 +110,14 @@ public class ContactActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (which == 0) {
+
+                                if (isVersion23() == true) {
+                                    getCameraPermission();
+                                }
+                                else {
+
+                                }
+
                                 Toast.makeText(ContactActivity.this,
                                         "Camera",
                                         Toast.LENGTH_SHORT)
@@ -124,6 +138,66 @@ public class ContactActivity extends AppCompatActivity {
 
     private boolean isVersion23() {
         return Build.VERSION.SDK_INT >= 23;
+    }
+
+
+    private void getCameraPermission() {
+
+        boolean hasCameraPermission =
+                (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.CAMERA)) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                        PackageManager.PERMISSION_GRANTED;
+
+        if (hasCameraPermission == true) {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(intent, CAMERA_REQUEST);
+        }
+        else {
+            requestPermissions(
+                    new String[]{Manifest.permission.CAMERA,
+                                 Manifest.permission.READ_EXTERNAL_STORAGE},
+                    CAMERA_PERMISSION_REQUEST);
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        List<String> stringList = new ArrayList<String>(Arrays.asList(permissions));
+        List<Integer> integerList = new ArrayList<Integer>();
+
+        for (int i = 0; i < grantResults.length; i++) {
+            integerList.add(grantResults[i]);
+        }
+
+
+        Log.d("My_camera_permission", requestCode +
+                "\n" + stringList.toString() +
+                "\n" + integerList.toString());
+
+        if (requestCode == CAMERA_PERMISSION_REQUEST) {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(intent, CAMERA_REQUEST);
+        }
+        else {
+            requestPermissions(
+                    new String[]{Manifest.permission.CAMERA,
+                            Manifest.permission.READ_EXTERNAL_STORAGE},
+                    CAMERA_PERMISSION_REQUEST);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == CAMERA_REQUEST) {
+                Log.d("Camera_result_data", data.toString());
+            }
+        }
     }
 
     @Override
