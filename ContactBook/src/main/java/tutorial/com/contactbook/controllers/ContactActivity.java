@@ -52,6 +52,8 @@ public class ContactActivity extends AppCompatActivity {
 
     private Contact mainContact;
 
+    private Bitmap bitmapUserAvatar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +83,15 @@ public class ContactActivity extends AppCompatActivity {
         ivAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                avatarDialog();
+
+                if (isVersion23()) {
+                    getCameraAndGalleyPermission();
+                }
+                else {
+                    avatarDialog();
+                }
+
+                //avatarDialog();
             }
         });
 
@@ -96,6 +106,9 @@ public class ContactActivity extends AppCompatActivity {
             etName.setText(mainContact.getName());
             etPhone.setText(mainContact.getPhoneNumber());
             etEmail.setText(mainContact.getEmail());
+            if (mainContact.getBitmapImage() != null) {
+                ivAvatar.setImageBitmap(mainContact.getBitmapImage());
+            }
         }
     }
 
@@ -115,22 +128,30 @@ public class ContactActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             if (which == 0) {
 
-                                if (isVersion23() == true) {
-                                    getCameraPermission();
-                                }
-                                else {
-                                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                    startActivityForResult(intent, CAMERA_REQUEST);
-                                }
+                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                startActivityForResult(intent, CAMERA_REQUEST);
+
+//                                if (isVersion23() == true) {
+//                                    getCameraPermission();
+//                                }
+//                                else {
+//
+//                                }
                             }
                             else if (which == 1) {
-                                if (isVersion23() == true) {
-                                    getGalleryPermission();
-                                }
-                                else {
-                                    Intent intent = new Intent(Intent.ACTION_PICK);
-                                    startActivityForResult(intent, GALLERY_REQUEST);
-                                }
+
+                                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                                intent.setType("image/*");
+                                startActivityForResult(intent, GALLERY_REQUEST);
+
+
+//                                if (isVersion23() == true) {
+//                                    getGalleryPermission();
+//                                }
+//                                else {
+//                                    Intent intent = new Intent(Intent.ACTION_PICK);
+//                                    startActivityForResult(intent, GALLERY_REQUEST);
+//                                }
                             }
                         }
                     })
@@ -143,6 +164,24 @@ public class ContactActivity extends AppCompatActivity {
         return Build.VERSION.SDK_INT >= 23;
     }
 
+
+    private void getCameraAndGalleyPermission() {
+        boolean hasCameraAndGalleyPermission =
+                (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.CAMERA)) == PackageManager.PERMISSION_GRANTED
+                        && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                        PackageManager.PERMISSION_GRANTED;
+
+        if (hasCameraAndGalleyPermission == true) {
+            avatarDialog();
+        }
+        else {
+            requestPermissions(
+                    new String[]{Manifest.permission.CAMERA,
+                            Manifest.permission.READ_EXTERNAL_STORAGE},
+                    CAMERA_PERMISSION_REQUEST);
+        }
+    }
 
     private void getCameraPermission() {
 
@@ -201,25 +240,26 @@ public class ContactActivity extends AppCompatActivity {
                 "\n" + integerList.toString());
 
         if (requestCode == CAMERA_PERMISSION_REQUEST) {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(intent, CAMERA_REQUEST);
+            avatarDialog();
+//            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//            startActivityForResult(intent, CAMERA_REQUEST);
         }
         else {
-            requestPermissions(
-                    new String[]{Manifest.permission.CAMERA,
-                            Manifest.permission.READ_EXTERNAL_STORAGE},
-                    CAMERA_PERMISSION_REQUEST);
+//            requestPermissions(
+//                    new String[]{Manifest.permission.CAMERA,
+//                            Manifest.permission.READ_EXTERNAL_STORAGE},
+//                    CAMERA_PERMISSION_REQUEST);
         }
 
-        if (requestCode == GALLERY_PERMISSION_REQUEST) {
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            startActivityForResult(intent, GALLERY_REQUEST);
-        }
-        else {
-            requestPermissions(
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    GALLERY_PERMISSION_REQUEST);
-        }
+//        if (requestCode == GALLERY_PERMISSION_REQUEST) {
+//            Intent intent = new Intent(Intent.ACTION_PICK);
+//            startActivityForResult(intent, GALLERY_REQUEST);
+//        }
+//        else {
+//            requestPermissions(
+//                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+//                    GALLERY_PERMISSION_REQUEST);
+//        }
     }
 
     @Override
@@ -228,17 +268,17 @@ public class ContactActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == CAMERA_REQUEST) {
                 Log.d("Camera_result_data", data.getExtras().get("data").toString());
-                Bitmap bitmap = (Bitmap)data.getExtras().get("data");
-                ivAvatar.setImageBitmap(bitmap);
+                bitmapUserAvatar = (Bitmap)data.getExtras().get("data");
+                ivAvatar.setImageBitmap(bitmapUserAvatar);
             }
             else if (requestCode == GALLERY_REQUEST) {
                 if (data != null) {
                     Log.d("Gallery_result_data", data.getData().toString());
 
                     try {
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(),
+                        bitmapUserAvatar = MediaStore.Images.Media.getBitmap(this.getContentResolver(),
                                 data.getData());
-                        ivAvatar.setImageBitmap(bitmap);
+                        ivAvatar.setImageBitmap(bitmapUserAvatar);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -338,11 +378,18 @@ public class ContactActivity extends AppCompatActivity {
             DatabaseConnector connector =
                     new DatabaseConnector(ContactActivity.this);
 
+            if (bitmapUserAvatar != null) {
+                Log.d("Image_size", bitmapUserAvatar.getByteCount() + "");
+            }
+
             //Proveriaem esli sushnost kontakt sushestvuet to obnovliaem ego
             if (mainContact != null) {
                 mainContact.setName(name);
                 mainContact.setPhoneNumber(phone);
                 mainContact.setEmail(email);
+                if (bitmapUserAvatar != null) {
+                    mainContact.setPhoto(bitmapUserAvatar);
+                }
                 connector.updateContact(mainContact);
 
                 //To be continue...
@@ -354,6 +401,9 @@ public class ContactActivity extends AppCompatActivity {
                 contact.setName(name);
                 contact.setPhoneNumber(phone);
                 contact.setEmail(email);
+                if (bitmapUserAvatar != null) {
+                    contact.setPhoto(bitmapUserAvatar);
+                }
                 connector.insertContact(contact);
             }
             return null;

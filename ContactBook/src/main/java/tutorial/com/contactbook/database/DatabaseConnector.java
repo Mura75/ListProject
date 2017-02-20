@@ -24,7 +24,7 @@ public class DatabaseConnector {
     public static final String TABLE_NAME = "CONTACT";
 
     //Версия базы данных
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
 
     //Столбец для ID
     public static final String ID = "ID";
@@ -38,6 +38,8 @@ public class DatabaseConnector {
     //Столбец для Почты
     public static final String EMAIL = "EMAIL";
 
+    //Столбец для Kartinki
+    public static final String PHOTO = "PHOTO";
 
     //Создание таблицы (SQL команда для создания таблицы)
     public static final String CREATE_TABLE =
@@ -45,7 +47,8 @@ public class DatabaseConnector {
             " (" + ID + " integer primary key autoincrement, " +
                     NAME + " TEXT, " +
                     PHONE + " TEXT, " +
-                    EMAIL + " TEXT" + ");";
+                    EMAIL + " TEXT, " +
+                    PHOTO + " TEXT" + ");";
 
 
     //Класс для работы с базой данных
@@ -79,6 +82,7 @@ public class DatabaseConnector {
         values.put(NAME, contact.getName());
         values.put(PHONE, contact.getPhoneNumber());
         values.put(EMAIL, contact.getEmail());
+        values.put(PHOTO, contact.getPhoto());
 
         open();
         database.insert(TABLE_NAME, null, values);
@@ -91,6 +95,7 @@ public class DatabaseConnector {
         values.put(NAME, contact.getName());
         values.put(PHONE, contact.getPhoneNumber());
         values.put(EMAIL, contact.getEmail());
+        values.put(PHOTO, contact.getPhoto());
 
         open();
         database.update(TABLE_NAME,
@@ -125,6 +130,7 @@ public class DatabaseConnector {
             contact.setName(cursor.getString(1));
             contact.setPhoneNumber(cursor.getString(2));
             contact.setEmail(cursor.getString(3));
+            contact.setPhoto(cursor.getString(4));
             contactList.add(contact);
         }
         close();
