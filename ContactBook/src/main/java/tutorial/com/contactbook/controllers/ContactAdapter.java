@@ -1,10 +1,12 @@
 package tutorial.com.contactbook.controllers;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -50,6 +52,7 @@ public class ContactAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.tvName = (TextView)view.findViewById(R.id.tvName);
             holder.tvPhone = (TextView)view.findViewById(R.id.tvPhone);
+            holder.ivAvatarRow = (ImageView) view.findViewById(R.id.ivAvatarRow);
             view.setTag(holder);
         }
         else {
@@ -58,6 +61,9 @@ public class ContactAdapter extends BaseAdapter {
 
         holder.tvName.setText(contactList.get(i).getName());
         holder.tvPhone.setText(contactList.get(i).getPhoneNumber());
+        if (contactList.get(i).getPhoto() != null) {
+            holder.ivAvatarRow.setImageURI(Uri.parse(contactList.get(i).getPhoto()));
+        }
 
         return view;
     }
@@ -65,5 +71,6 @@ public class ContactAdapter extends BaseAdapter {
     private class ViewHolder {
         TextView tvName;
         TextView tvPhone;
+        ImageView ivAvatarRow;
     }
 }

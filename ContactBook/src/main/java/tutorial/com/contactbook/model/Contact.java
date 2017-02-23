@@ -73,6 +73,7 @@ public class Contact implements Parcelable {
         }
     }
 
+    //NE ISPOLZOVIAT
     //Kodiruem foto v formate JPEG v String
     //bitmap -> byte[] -> String
     public void setPhoto(Bitmap bitmap) {

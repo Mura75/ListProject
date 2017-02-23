@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -53,6 +54,8 @@ public class ContactActivity extends AppCompatActivity {
     private Contact mainContact;
 
     private Bitmap bitmapUserAvatar;
+
+    private String imageRealPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,8 +109,8 @@ public class ContactActivity extends AppCompatActivity {
             etName.setText(mainContact.getName());
             etPhone.setText(mainContact.getPhoneNumber());
             etEmail.setText(mainContact.getEmail());
-            if (mainContact.getBitmapImage() != null) {
-                ivAvatar.setImageBitmap(mainContact.getBitmapImage());
+            if (mainContact.getPhoto() != null) {
+                ivAvatar.setImageURI(Uri.parse(mainContact.getPhoto()));
             }
         }
     }
@@ -166,6 +169,7 @@ public class ContactActivity extends AppCompatActivity {
 
 
     private void getCameraAndGalleyPermission() {
+
         boolean hasCameraAndGalleyPermission =
                 (ContextCompat.checkSelfPermission(this,
                         Manifest.permission.CAMERA)) == PackageManager.PERMISSION_GRANTED
@@ -268,8 +272,17 @@ public class ContactActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == CAMERA_REQUEST) {
                 Log.d("Camera_result_data", data.getExtras().get("data").toString());
-                bitmapUserAvatar = (Bitmap)data.getExtras().get("data");
+                bitmapUserAvatar = (Bitmap) data.getExtras().get("data");
                 ivAvatar.setImageBitmap(bitmapUserAvatar);
+
+                String path = MediaStore.Images.Media.insertImage(this.getContentResolver(),
+                        bitmapUserAvatar, "avatar", "desc");
+
+                imageRealPath = getRealPath(path);
+
+                Log.d("Image_camera_path", path + "\n" + getRealPath(path));
+
+
             }
             else if (requestCode == GALLERY_REQUEST) {
                 if (data != null) {
@@ -279,6 +292,15 @@ public class ContactActivity extends AppCompatActivity {
                         bitmapUserAvatar = MediaStore.Images.Media.getBitmap(this.getContentResolver(),
                                 data.getData());
                         ivAvatar.setImageBitmap(bitmapUserAvatar);
+
+                        String path = MediaStore.Images.Media.insertImage(this.getContentResolver(),
+                                bitmapUserAvatar, "avatar", "desc");
+
+                        imageRealPath = getRealPath(path);
+
+                        Log.d("Image_camera_path", MediaStore.Images.Media.insertImage(this.getContentResolver(),
+                                bitmapUserAvatar, "avatar", "desc"));
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -290,6 +312,13 @@ public class ContactActivity extends AppCompatActivity {
             }
     }
 
+
+    private String getRealPath(String path) {
+        Cursor cursor = getContentResolver().query(Uri.parse(path), null, null, null, null);
+        cursor.moveToFirst();
+        int index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+        return cursor.getString(index);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -387,8 +416,8 @@ public class ContactActivity extends AppCompatActivity {
                 mainContact.setName(name);
                 mainContact.setPhoneNumber(phone);
                 mainContact.setEmail(email);
-                if (bitmapUserAvatar != null) {
-                    mainContact.setPhoto(bitmapUserAvatar);
+                if (imageRealPath != null) {
+                    mainContact.setPhoto(imageRealPath);
                 }
                 connector.updateContact(mainContact);
 
@@ -401,8 +430,8 @@ public class ContactActivity extends AppCompatActivity {
                 contact.setName(name);
                 contact.setPhoneNumber(phone);
                 contact.setEmail(email);
-                if (bitmapUserAvatar != null) {
-                    contact.setPhoto(bitmapUserAvatar);
+                if (imageRealPath != null) {
+                    contact.setPhoto(imageRealPath);
                 }
                 connector.insertContact(contact);
             }
