@@ -3,6 +3,7 @@ package tutorial.com.contactbook.controllers;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -23,6 +25,8 @@ import tutorial.com.contactbook.model.Contact;
 public class MainActivity extends AppCompatActivity {
 
     private ListView lvContact;
+
+    private FloatingActionButton fabAdd;
 
     private ContactAdapter contactAdapter;
 
@@ -38,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         lvContact = (ListView) findViewById(R.id.lvContact);
 
+        fabAdd = (FloatingActionButton) findViewById(R.id.fabAdd);
 
         //Obrabativaem klic elementa spiske
         lvContact.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -57,6 +62,25 @@ public class MainActivity extends AppCompatActivity {
                 Contact contactToRemove = contactList.get(position);
                 showRemoveContactDialog(contactToRemove);
                 return true;
+            }
+        });
+
+        lvContact.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+                if (scrollState == SCROLL_STATE_TOUCH_SCROLL) {
+                    fabAdd.hide();
+                }
+                else {
+                    fabAdd.show();
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                                 int visibleItemCount, int totalItemCount) {
+
             }
         });
     }

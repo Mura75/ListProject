@@ -17,14 +17,16 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp">
 
         <TextView
             android:text="TextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/tvName"
-            android:textSize="16sp"/>
+            android:textSize="18sp"
+            android:textColor="@color/colorPrimaryDark"/>
 
         <TextView
             android:text="TextView"
@@ -32,7 +34,8 @@
             android:layout_height="wrap_content"
             android:paddingTop="4dp"
             android:textSize="13sp"
-            android:id="@+id/tvPhone" />
+            android:id="@+id/tvPhone"
+            android:textColor="@android:color/darker_gray"/>
     </LinearLayout>
 
 </LinearLayout>

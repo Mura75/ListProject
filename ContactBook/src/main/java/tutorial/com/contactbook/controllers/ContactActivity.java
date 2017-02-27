@@ -12,10 +12,14 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import tutorial.com.contactbook.R;
 import tutorial.com.contactbook.database.DatabaseConnector;
 import tutorial.com.contactbook.model.Contact;
@@ -43,9 +48,11 @@ public class ContactActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 400;
     private static final int GALLERY_REQUEST = 401;
 
-    private ImageView ivAvatar;
+    private CircleImageView ivAvatar;
 
     private EditText etName, etSurname, etPhone, etEmail;
+
+    private TextInputLayout tilName, tilPhone;
 
     private Button buttonSave;
 
@@ -62,26 +69,60 @@ public class ContactActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
 
-        ivAvatar = (ImageView) findViewById(R.id.ivAvatar);
+        ivAvatar = (CircleImageView) findViewById(R.id.ivAvatar);
         etName = (EditText) findViewById(R.id.etName);
         etSurname = (EditText) findViewById(R.id.etSurname);
         etPhone = (EditText) findViewById(R.id.etPhone);
         etEmail = (EditText) findViewById(R.id.etEmail);
         buttonSave = (Button) findViewById(R.id.buttonSave);
 
+        tilName = (TextInputLayout)findViewById(R.id.tilName);
+        tilPhone = (TextInputLayout) findViewById(R.id.tilPhone);
+
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 String name = etName.getText().toString();
                 String phone = etPhone.getText().toString();
                 String email = etEmail.getText().toString();
 
-                createOrUpdateContactAsync =
-                        new CreateOrUpdateContactAsync(name, "", phone, email);
-                createOrUpdateContactAsync.execute();
+                if (name == null || name.length() == 0) {
+                    tilName.setError("Name is empty");
+                }
+
+                if (TextUtils.isEmpty(phone)) {
+                    tilPhone.setError("Phone is empty");
+                }
+
+                if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(phone)){
+                    createOrUpdateContactAsync =
+                            new CreateOrUpdateContactAsync(name, "", phone, email);
+                    createOrUpdateContactAsync.execute();
+                }
+
             }
         });
 
+        etName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!TextUtils.isEmpty(s)) {
+                    tilName.setErrorEnabled(false);
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         ivAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,8 +134,6 @@ public class ContactActivity extends AppCompatActivity {
                 else {
                     avatarDialog();
                 }
-
-                //avatarDialog();
             }
         });
 
@@ -109,7 +148,7 @@ public class ContactActivity extends AppCompatActivity {
             etName.setText(mainContact.getName());
             etPhone.setText(mainContact.getPhoneNumber());
             etEmail.setText(mainContact.getEmail());
-            if (mainContact.getPhoto() != null) {
+            if (mainContact != null && !TextUtils.isEmpty(mainContact.getPhoto())) {
                 ivAvatar.setImageURI(Uri.parse(mainContact.getPhoto()));
             }
         }
