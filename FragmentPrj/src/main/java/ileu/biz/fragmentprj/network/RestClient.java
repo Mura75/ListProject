@@ -1,6 +1,7 @@
 package ileu.biz.fragmentprj.network;
 
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Murager on 3/2/17.
@@ -13,6 +14,7 @@ public class RestClient {
     private static Retrofit retrofit =
             new Retrofit.Builder()
                     .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
                     .build();
 
 

@@ -1,8 +1,13 @@
 package ileu.biz.fragmentprj.network;
 
 
+import com.google.gson.JsonArray;
+
 import org.json.JSONArray;
 
+import java.util.List;
+
+import ileu.biz.fragmentprj.models.Post;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -14,6 +19,6 @@ import retrofit2.http.GET;
 public interface ApiService {
 
     @GET("posts")
-    Call<ResponseBody> getPostList();
+    Call<List<Post>> getPostList();
 
 }

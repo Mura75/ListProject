@@ -11,12 +11,18 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import ileu.biz.fragmentprj.models.Post;
 import ileu.biz.fragmentprj.network.RestClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -60,41 +66,58 @@ public class PostFragment extends Fragment {
 
 
     private void getPostList() {
-        Call<ResponseBody> call = RestClient.request().getPostList();
+        Call<List<Post>> call = RestClient.request().getPostList();
 
         Log.d("My_post_list_url", call.request().url().toString());
 
-        call.enqueue(new Callback<ResponseBody>() {
+        call.enqueue(new Callback<List<Post>>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
                 if (response.isSuccessful()) {
-                    try {
-                        Log.d("My_post_list", response.body().string());
 
-                        JSONArray jsonArray = new JSONArray(response.body().string());
+                    List<Post> list = response.body();
+                    tvHello.setText(list.toString());
 
-                        JSONObject jo = jsonArray.getJSONObject(1);
 
-                        Log.d("My_post_array", jsonArray.toString());
+                    Log.d("My_post_list", response.body().toString());
 
-                        Log.d("My_post_obj", jo.toString());
-
-                        tvHello.setText(jo.toString());
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Log.d("My_post_obj", e.toString());
-
-                    }
-
+                    //OLD WAY Parsing of json
+//                    JsonArray jsonArray = response.body();
+//
+//                    JsonObject jsonObject = jsonArray.get(0).getAsJsonObject();
+//
+//                    Post post = new Post();
+//
+//                    post.setUserId(jsonObject.get("userId").getAsInt());
+//                    post.setId(jsonObject.get("id").getAsInt());
+//                    post.setTitle(jsonObject.get("title").getAsString());
+//                    post.setBody(jsonObject.get("body").getAsString());
+//
+//
+//
+//
+//
+//                    List<Post> postList = new ArrayList<>();
+//
+//                    for (int i = 0; i < jsonArray.size(); i++) {
+//                        JsonObject jo = jsonArray.get(i).getAsJsonObject();
+//                        Post p = new Post();
+//
+//                        p.setUserId(jo.get("userId").getAsInt());
+//                        p.setId(jo.get("id").getAsInt());
+//                        p.setTitle(jo.get("title").getAsString());
+//                        p.setBody(jo.get("body").getAsString());
+//
+//                        postList.add(p);
+//                    }
+//
+//                    tvHello.setText(postList.toString());
 
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<List<Post>> call, Throwable t) {
                 Log.d("My_post_list_error", t.toString());
             }
         });
