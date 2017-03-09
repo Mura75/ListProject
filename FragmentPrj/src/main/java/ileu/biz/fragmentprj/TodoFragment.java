@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ import retrofit2.Response;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TodoFragment extends Fragment {
+public class TodoFragment extends Fragment implements OnRecyclerViewItemClick {
 
     private RecyclerView recyclerView;
 
@@ -58,7 +59,7 @@ public class TodoFragment extends Fragment {
                 if (response.isSuccessful()) {
                     List<Post> list = response.body();
 
-                    adapter2 = new PostAdapter2(list);
+                    adapter2 = new PostAdapter2(list, TodoFragment.this);
                     recyclerView.setAdapter(adapter2);
                 }
             }
@@ -70,4 +71,13 @@ public class TodoFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onShareClick(String data) {
+        Toast.makeText(getActivity(), "From todo fragment " + data, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onLikeClick(String data) {
+        Toast.makeText(getActivity(), "From todo fragment " + data, Toast.LENGTH_SHORT).show();
+    }
 }

@@ -32,6 +32,10 @@ public class MainActivity extends AppCompatActivity {
 //                .commit();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
 
     private void createDrawer() {
 
