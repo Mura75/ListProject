@@ -7,6 +7,7 @@ import org.json.JSONArray;
 
 import java.util.List;
 
+import ileu.biz.fragmentprj.models.Photo;
 import ileu.biz.fragmentprj.models.Post;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -21,4 +22,8 @@ public interface ApiService {
     @GET("posts")
     Call<List<Post>> getPostList();
 
+    @GET("photos")
+    Call<List<Photo>> getPhotosList();
+
 }
+
