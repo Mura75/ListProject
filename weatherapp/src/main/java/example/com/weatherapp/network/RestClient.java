@@ -11,8 +11,12 @@ public class RestClient {
 
     private static Retrofit retrofit =
             new Retrofit.Builder()
-                    .baseUrl("")
+                    .baseUrl(ApiService.BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
+
+    public static ApiService request() {
+        return retrofit.create(ApiService.class);
+    }
 
 }
