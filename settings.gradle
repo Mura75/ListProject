@@ -1,1 +1,1 @@
-include ':app', ':ContactBook', ':FragmentPrj', ':weatherapp'
+include ':app', ':ContactBook', ':FragmentPrj', ':weatherapp', ':googlemapproject'
